@@ -279,7 +279,47 @@
     var toggle = document.getElementById('hero-order-toggle');
     var optionsBefore = document.getElementById('hero-order-options-before');
     var optionsAfter = document.getElementById('hero-order-options-after');
+    var media = document.getElementById('hero-poster-media');
+    var ctaZone = document.getElementById('hero-poster-cta-zone');
     if (!root || !toggle || !optionsBefore || !optionsAfter) return;
+
+    var desktopOrderMq = window.matchMedia('(min-width: 768px)');
+
+    /** שברי ממדים יחסית לתמונת הדסקטop (1024×576) — מכוון לעיגול הצהוב */
+    var DESKTOP_CTA_FRAC = {
+      cx: 0.316,
+      cy: 0.866,
+      w: 0.105,
+      h: 0.155
+    };
+
+    function desktopCtaHit(clientX, clientY) {
+      if (!media) return false;
+      var rect = media.getBoundingClientRect();
+      if (!rect.width || !rect.height) return false;
+      var cx = rect.left + rect.width * DESKTOP_CTA_FRAC.cx;
+      var cy = rect.top + rect.height * DESKTOP_CTA_FRAC.cy;
+      var hw = rect.width * DESKTOP_CTA_FRAC.w * 0.55;
+      var hh = rect.height * DESKTOP_CTA_FRAC.h * 0.55;
+      return (
+        Math.abs(clientX - cx) <= hw &&
+        Math.abs(clientY - cy) <= hh
+      );
+    }
+
+    function activateHeroOrderFromPointer(e) {
+      if (root.classList.contains('is-phone-ready')) {
+        window.location.href = 'tel:' + HERO_CONTACT.phone;
+        resetOrder();
+        return;
+      }
+      if (!root.classList.contains('is-open')) {
+        setOpen(true);
+        setPhoneReady(true);
+      } else {
+        resetOrder();
+      }
+    }
 
     var tenbis = document.getElementById('hero-order-tenbis');
     var wolt = document.getElementById('hero-order-wolt');
@@ -321,6 +361,10 @@
 
     function setOpen(open) {
       root.classList.toggle('is-open', open);
+      if (ctaZone) {
+        ctaZone.classList.toggle('is-expanded', open);
+      }
+      document.body.classList.toggle('hero-order-open', open);
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       optionsBefore.hidden = !open;
       optionsAfter.hidden = !open;
@@ -355,9 +399,42 @@
       resetOrder();
     });
 
+    function isInsideOrderUi(target) {
+      if (!target) return false;
+      if (root.contains(target)) return true;
+      if (ctaZone && ctaZone.contains(target)) return true;
+      return false;
+    }
+
+    if (ctaZone) {
+      ctaZone.addEventListener('click', function (e) {
+        if (!desktopOrderMq.matches) return;
+        if (e.target.closest('.hero-order-circle')) return;
+        if (e.target === toggle || toggle.contains(e.target)) return;
+        e.preventDefault();
+        e.stopPropagation();
+        activateHeroOrderFromPointer(e);
+      });
+    }
+
+    if (media) {
+      media.addEventListener(
+        'click',
+        function (e) {
+          if (!desktopOrderMq.matches) return;
+          if (isInsideOrderUi(e.target)) return;
+          if (!desktopCtaHit(e.clientX, e.clientY)) return;
+          e.preventDefault();
+          e.stopPropagation();
+          activateHeroOrderFromPointer(e);
+        },
+        true
+      );
+    }
+
     document.addEventListener('click', function (e) {
       if (!root.classList.contains('is-open')) return;
-      if (root.contains(e.target)) return;
+      if (isInsideOrderUi(e.target)) return;
       resetOrder();
     });
 

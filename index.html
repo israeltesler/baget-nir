@@ -84,17 +84,27 @@
   <main id="main">
     <section class="hero hero-poster" aria-labelledby="hero-title">
       <h1 id="hero-title" class="sr-only">באגט ניר — שווארמה גלילית אמיתית</h1>
-      <img
-        class="hero-poster-image"
-        src="assets/img/hero-poster.png?v=1"
-        alt="באגט ניר — שווארמה גלילית אמיתית, כשרות מהדרין"
-        width="682"
-        height="1024"
-        fetchpriority="high"
-        decoding="async"
-      >
-      <div class="hero-poster-order" id="hero-poster-order">
-        <div class="hero-poster-order-slot">
+      <div class="hero-poster-media" id="hero-poster-media">
+        <picture>
+          <source
+            media="(min-width: 768px)"
+            srcset="assets/img/hero-banner-desktop.jpg?v=1"
+            width="1024"
+            height="576"
+          >
+          <img
+            class="hero-poster-image"
+            src="assets/img/hero-poster.png?v=1"
+            alt="באגט ניר — שווארמה גלילית אמיתית, כשרות מהדרין"
+            width="682"
+            height="1024"
+            fetchpriority="high"
+            decoding="async"
+          >
+        </picture>
+        <div class="hero-poster-cta-zone" id="hero-poster-cta-zone">
+          <div class="hero-poster-order" id="hero-poster-order">
+            <div class="hero-poster-order-slot">
           <div class="hero-poster-order-options hero-poster-order-options--before" id="hero-order-options-before" hidden>
             <a class="hero-order-circle hero-order-circle--tenbis hero-order-chip" id="hero-order-tenbis" href="#" target="_blank" rel="noopener noreferrer" aria-label="הזמנה דרך תן ביס">
               <span class="hero-order-circle-label">תן ביס</span>
@@ -128,6 +138,8 @@
                 </svg>
               </span>
             </a>
+          </div>
+            </div>
           </div>
         </div>
       </div>

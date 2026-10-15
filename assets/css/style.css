@@ -1889,7 +1889,17 @@ body::before {
   padding: 0;
   overflow: visible;
   background: #090908;
+}
+
+.hero-poster-media {
+  position: relative;
+  display: block;
+  width: 100%;
+  line-height: 0;
   container-type: inline-size;
+  container-name: hero-poster;
+  pointer-events: auto;
+  --hero-yellow-size: clamp(3.35rem, 22.8cqi, 5.15rem);
 }
 
 .hero-poster picture {
@@ -1905,20 +1915,52 @@ body::before {
   max-width: none;
   max-height: none;
   object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* אזור לחיצה על העיגול הצהוב בתמונה */
+.hero-poster-cta-zone {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: 4.65%;
+  width: var(--hero-yellow-size);
+  height: var(--hero-yellow-size);
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.hero-poster-cta-zone > .hero-poster-order {
+  pointer-events: auto;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-poster-cta-zone:not(:has(.hero-poster-order.is-open)) .hero-poster-order-slot {
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+}
+
+.hero-poster-cta-zone:not(:has(.hero-poster-order.is-open)) .hero-poster-order-toggle.hero-order-chip {
+  width: 100%;
+  height: 100%;
+  flex: 1 1 auto;
 }
 
 .hero-poster-order {
-  /* גודל/מיקום לפי העיגול הצהוב ב־hero-poster.png (682×1024) */
-  --hero-yellow-size: clamp(3.35rem, 22.8cqi, 5.15rem);
   --hero-order-chip: var(--hero-yellow-size);
-  position: absolute;
-  z-index: 3;
-  left: 50%;
-  bottom: 4.65%;
+  position: relative;
+  z-index: 1;
   height: var(--hero-yellow-size);
-  max-width: calc(100% - 0.5rem);
+  max-width: none;
   direction: ltr;
-  translate: -50% 0;
 }
 
 .hero-poster-order-slot {
@@ -1959,10 +2001,14 @@ body::before {
   height: var(--hero-order-opt);
 }
 
-.hero-poster-order.is-open .hero-poster-order-toggle.hero-order-chip {
+.hero-poster-order.is-open .hero-poster-order-toggle.hero-order-chip,
+.hero-poster-order.is-phone-ready .hero-poster-order-toggle.hero-order-chip {
+  flex: 0 0 var(--hero-yellow-size);
   flex-basis: var(--hero-yellow-size);
   width: var(--hero-yellow-size);
   height: var(--hero-yellow-size);
+  min-width: var(--hero-yellow-size);
+  min-height: var(--hero-yellow-size);
 }
 
 .hero-poster-order-toggle {
@@ -1998,14 +2044,28 @@ body::before {
 
 .hero-poster-order.is-phone-ready .hero-poster-order-phone-icon {
   display: block;
+  width: 44%;
+  height: 44%;
 }
 
 .hero-poster-order.is-phone-ready .hero-poster-order-toggle {
-  background: linear-gradient(180deg, #3fe06a 0%, #30d158 42%, #28a745 100%);
+  background: linear-gradient(180deg, #5ce883 0%, #34c759 48%, #1e9a42 100%);
   border: none;
   box-shadow:
     0 4px 14px rgba(0, 0, 0, 0.38),
     inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  transform: scale(1.06);
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.15s ease;
+}
+
+.hero-poster-order.is-phone-ready .hero-poster-order-toggle:active {
+  transform: scale(0.98);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .hero-poster-order-toggle:focus-visible {
@@ -2147,11 +2207,81 @@ body::before {
 }
 
 @media (min-width: 768px) {
+  .hero-poster picture {
+    display: block;
+    width: 100%;
+  }
+
   .hero-poster-image {
     width: 100%;
-    max-width: min(28rem, 100%);
-    margin-inline: auto;
+    max-width: none;
+    height: auto;
+    margin-inline: 0;
+    object-fit: contain;
   }
+
+  /*
+   * העיגול הצהוב «להזמנה» ב־hero-banner-desktop.jpg (1024×576)
+   * מרכז ~ (31.6%, 86.6%) · קוטר ~8% מרוחב התמונה
+   */
+  .hero-poster-media {
+    /* קוטר העיגול הצהוב ~9% מרוחב הבאנר — ללא תקרה נמוכה */
+    --hero-yellow-size: max(3.5rem, 9.2cqi);
+  }
+
+  .hero-poster-cta-zone {
+    left: 31.6%;
+    top: 86.6%;
+    bottom: auto;
+    width: var(--hero-yellow-size);
+    height: var(--hero-yellow-size);
+    translate: -50% -50%;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  /* פתוח: כמו בנייד — 2 צ'יפים בכל צד + מרכז ירוק לחיוג */
+  .hero-poster-cta-zone.is-expanded {
+    width: max-content;
+    max-width: min(96vw, 26rem);
+    height: auto;
+    min-height: var(--hero-yellow-size, 3.35rem);
+    z-index: 60;
+    cursor: default;
+  }
+
+  .hero-poster-cta-zone.is-expanded > .hero-poster-order {
+    width: max-content;
+    height: auto;
+    max-width: min(96vw, 26rem);
+  }
+
+  .hero-poster-cta-zone.is-expanded .hero-poster-order-slot {
+    width: max-content;
+    max-width: min(96vw, 26rem);
+    justify-content: center;
+  }
+
+  .hero-poster-cta-zone.is-expanded .hero-poster-order-toggle.hero-order-chip {
+    width: var(--hero-yellow-size);
+    height: var(--hero-yellow-size);
+    min-width: var(--hero-yellow-size);
+    min-height: var(--hero-yellow-size);
+    flex: 0 0 var(--hero-yellow-size);
+  }
+
+  .hero-poster-order.is-open .hero-order-circle.hero-order-chip {
+    --hero-order-opt: clamp(2.65rem, 13.2cqi, 3.75rem);
+  }
+
+  .hero-order-circle {
+    font-size: clamp(0.72rem, 2.85cqi, 0.92rem);
+  }
+}
+
+body.hero-order-open .hero.hero-poster {
+  z-index: 40;
+  overflow: visible;
 }
 
 @media (prefers-reduced-motion: reduce) {
